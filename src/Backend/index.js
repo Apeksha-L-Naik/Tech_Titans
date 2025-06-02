@@ -38,7 +38,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Routes
 
 // Signup Route
-app.post("/api/signup", async (req, res) => {
+app.post("/api/buyersignup", async (req, res) => {
   try {
     console.log("Signup request body:", req.body);
 
@@ -83,7 +83,7 @@ app.post("/api/signup", async (req, res) => {
 
 
 // Login Route
-app.post("/api/login", async (req, res) => {
+app.post("/api/buyerlogin", async (req, res) => {
   try {
     const { email, password } = req.body;
 

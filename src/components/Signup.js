@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode"; // ✅ Import jwt-decode
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -13,11 +14,10 @@ const Signup = () => {
 
   const [error, setError] = useState("");
 
-  // Redirect if already logged in (optional)
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/buyerhome"); // or wherever you want logged in users to go
+      navigate("/buyerhome");
     }
   }, [navigate]);
 
@@ -31,7 +31,7 @@ const Signup = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/signup", {
+      const res = await fetch("http://localhost:5000/api/buyersignup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -40,8 +40,22 @@ const Signup = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // After successful signup, redirect to login page regardless of role
-        navigate("/");
+        // ✅ Store JWT
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // ✅ Decode token to get role
+        const decoded = jwtDecode(data.token);
+        const role = decoded.role;
+
+        // ✅ Redirect based on role
+        if (role === "buyer") {
+          navigate("/");
+        } else if (role === "fishermen") {
+          navigate("/fisherlogin");
+        } else {
+          navigate("/");
+        }
       } else {
         setError(data.message || "Signup failed.");
       }
@@ -53,7 +67,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left Section - Image */}
       <div className="hidden md:flex w-1/2 bg-sky-400 items-center justify-center">
         <img
           src="https://i.pinimg.com/736x/48/17/2d/48172dc2448b4bb1dcce3ef929ab3082.jpg"
@@ -62,7 +75,6 @@ const Signup = () => {
         />
       </div>
 
-      {/* Right Section - Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center bg-sky-50 px-8 py-12">
         <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
           <h2 className="text-3xl font-bold text-center text-sky-600 mb-2">Create Account</h2>
