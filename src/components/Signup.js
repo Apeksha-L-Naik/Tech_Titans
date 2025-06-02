@@ -1,12 +1,54 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "fishermen",
+  });
+
+  const [error, setError] = useState("");
+
+  // Redirect if already logged in (optional)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/buyerhome"); // or wherever you want logged in users to go
+    }
+  }, [navigate]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/"); // Redirect to login after signup
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // After successful signup, redirect to login page regardless of role
+        navigate("/");
+      } else {
+        setError(data.message || "Signup failed.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      setError("Something went wrong.");
+    }
   };
 
   return (
@@ -14,7 +56,7 @@ const Signup = () => {
       {/* Left Section - Image */}
       <div className="hidden md:flex w-1/2 bg-sky-400 items-center justify-center">
         <img
-          src="https://i.pinimg.com/736x/48/17/2d/48172dc2448b4bb1dcce3ef929ab3082.jpg" // Replace with your preferred illustration URL
+          src="https://i.pinimg.com/736x/48/17/2d/48172dc2448b4bb1dcce3ef929ab3082.jpg"
           alt="Signup Illustration"
           className="w-3/4"
         />
@@ -26,11 +68,18 @@ const Signup = () => {
           <h2 className="text-3xl font-bold text-center text-sky-600 mb-2">Create Account</h2>
           <p className="text-center text-gray-500 mb-6">Sign up to get started</p>
 
+          {error && (
+            <div className="text-red-600 text-sm mb-4 text-center">{error}</div>
+          )}
+
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">Name</label>
               <input
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                 placeholder="Your Name"
                 required
@@ -41,6 +90,9 @@ const Signup = () => {
               <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                 placeholder="you@example.com"
                 required
@@ -51,22 +103,29 @@ const Signup = () => {
               <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
               <input
                 type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                 placeholder="••••••••"
                 required
               />
             </div>
-             <div>
+
+            <div>
               <label className="block mb-1 text-sm font-medium text-gray-700">Role</label>
               <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
                 required
               >
-                
                 <option value="fishermen">Fishermen</option>
                 <option value="buyer">Buyer</option>
               </select>
             </div>
+
             <button
               type="submit"
               className="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 rounded-lg transition duration-200"
@@ -88,6 +147,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
-

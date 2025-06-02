@@ -22,9 +22,9 @@ mongoose.connect(process.env.MONGO_URI)
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // Fisherman model
-const Fisherman = mongoose.model('Fisherman', {
+const fishermen_verify = mongoose.model('fishermen_verify', {
   name: String,
-  phone: String,
+  mobile: String,
   licenseId: String,
   region: String,
   address: String,
@@ -35,13 +35,15 @@ const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString()
 
 // POST /login
 app.post('/login', async (req, res) => {
-  const { name, licenseId, phone } = req.body;
-  const fisherman = await Fisherman.findOne({ name, licenseId, phone });
+  const { name, licenseId, mobile } = req.body;
+  console.log('Received:', { name, licenseId, mobile });
+  const fishermen = await fishermen_verify.findOne({ name, licenseId, mobile });
+  console.log('Found fisherman:', fishermen);
 
-  if (fisherman) {
+  if (fishermen) {
     const otp = generateOTP();
-    OTP_STORE.set(phone, otp);
-    setTimeout(() => OTP_STORE.delete(phone), 2 * 60 * 1000); // 2 min expiry
+    OTP_STORE.set(mobile, otp);
+    setTimeout(() => OTP_STORE.delete(mobile), 2 * 60 * 1000); // 2 min expiry
 
     try {
       await client.messages.create({
@@ -60,9 +62,9 @@ app.post('/login', async (req, res) => {
 
 // POST /verify
 app.post('/verify', (req, res) => {
-  const { phone, otp } = req.body;
-  if (OTP_STORE.get(phone) === otp) {
-    OTP_STORE.delete(phone);
+  const { mobile, otp } = req.body;
+  if (OTP_STORE.get(mobile) === otp) {
+    OTP_STORE.delete(mobile);
     res.json({ success: true, message: 'OTP verified' });
   } else {
     res.json({ success: false, message: 'Invalid OTP' });

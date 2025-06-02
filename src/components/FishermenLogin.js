@@ -3,7 +3,7 @@ import axios from 'axios';
 
 function FishermenLogin() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({ name: '', licenseId: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', licenseId: '', mobile: '' });
   const [otp, setOtp] = useState('');
 
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,7 +20,7 @@ function FishermenLogin() {
 
   const handleVerify = async () => {
     const res = await axios.post('http://localhost:5000/verify', {
-      phone: formData.phone,
+      mobile: formData.mobile,
       otp,
     });
     if (res.data.success) {
@@ -38,7 +38,7 @@ function FishermenLogin() {
           <h2>Login</h2>
           <input name="name" placeholder="Name" onChange={handleInputChange} /><br />
           <input name="licenseId" placeholder="License ID" onChange={handleInputChange} /><br />
-          <input name="phone" placeholder="Phone Number" onChange={handleInputChange} /><br />
+          <input name="mobile" placeholder="Phone Number" onChange={handleInputChange} /><br />
           <button onClick={handleLogin}>Send OTP</button>
         </>
       )}

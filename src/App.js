@@ -1,15 +1,16 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import FishermenLogin from "./Components/FishermenLogin";
+import Login from './Components/Login'
+import SignUp from './Components/Signup'
+import BuyerHome from "./Components/BuyerHome";
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} /> */}
-        <Route path="/" element={<FishermenLogin/>}/>
+        <Route path="/" element={<Login/>} />
+        <Route path="/signup" element={<SignUp/>} />
+        <Route path="/buyerhome" element={<BuyerHome/>}/>
       </Routes>
     </Router>
   );
