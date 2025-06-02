@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import FishermenLogin from "./Components/FishermenLogin";
+import FishermenLogin from "./components/FishermenLogin";
 
 const App = () => {
   return (
